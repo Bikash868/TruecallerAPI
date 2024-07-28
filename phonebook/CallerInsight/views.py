@@ -81,4 +81,66 @@ class Login(APIView):
         }, status=status.HTTP_200_OK) 
 
 
+#Searching user by name  
+class SearchByName(APIView):
+    def get(self, request):
+        name = request.data.get("name")
+        if not name:
+            return Response({
+                "Error": "Name is required"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        name_filter = UserProfile.objects.filter(user__username__startswith = name) | UserProfile.objects.filter(user__username__contains = name)
+        contact_filter = Contact.objects.filter(name__startswith = name) | Contact.objects.filter(name__contains = name)
+        
+        response = []
+
+        print("name_filter:", name_filter)
+
+        for profile in name_filter:
+            response.append({
+                "name": profile.user.username,
+                "phone_number": profile.phone_number,
+                "spam": profile.spam
+            })
+
+        for profile in contact_filter:
+            response.append({
+                "name": profile.name,
+                "phone_number": profile.phone_number,
+                "spam": profile.spam
+            })
+
+        return Response({
+                "data": response
+            },
+            status= status.HTTP_200_OK
+        )
+
+#Searching user by phone number
+class SearchByPhoneNumber(APIView):
+    def get(self, request):
+        phone_number = request.data.get("phone_number")
+        if not phone_number:
+            return Response({
+                "Error": "Phone number is required"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        profile = UserProfile.objects.filter(phone_number=phone_number).first()
+        print(profile)
+
+        if profile:
+            # user = User.objects.filter(username = profile.user.username, is_active = True)
+            # print("user:",user)
+            return Response({
+                "name": profile.user.username,
+                "phone_number":profile.phone_number,
+                "spam":profile.spam,
+                "email":profile.email
+            }, status=status.HTTP_200_OK)
+        else:
+            contact = Contact.objects.filter(phone_number=phone_number)
+            serializer=ContactSerializer(contact,many=True)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+
 
