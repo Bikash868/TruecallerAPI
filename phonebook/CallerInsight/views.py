@@ -143,4 +143,27 @@ class SearchByPhoneNumber(APIView):
             serializer=ContactSerializer(contact,many=True)
             return Response(serializer.data,status=status.HTTP_200_OK)
 
+#Marking a user as spam 
+class MarkSpam(APIView):
+    def post(self, request):
+        phone_number = request.data.get("phone_number")
+        if not phone_number:
+            return Response(
+				{
+					"Error":"Phone number required!!"
+				},
+				status = status.HTTP_400_BAD_REQUEST
+			)
+        contact, _ = Contact.objects.get_or_create(phone_number=phone_number)
+        profile, _ = UserProfile.objects.get_or_create(phone_number=phone_number)
+
+        contact.spam = True
+        profile.spam = True
+        contact.save()
+        profile.save()
+
+        return Response(
+            {"Message": "Contact marked as spam successfully"},
+            status=status.HTTP_200_OK,
+        )
 
