@@ -6,5 +6,7 @@ urlpatterns=[
 	path('login/',Login.as_view(),name='login'),
 
 	path('search_by_name/',SearchByName.as_view(),name='search_by_name'),
-	path('search_by_phone_number/',SearchByPhoneNumber.as_view(),name='search_by_phone_number'),	
+	path('search_by_phone_number/',SearchByPhoneNumber.as_view(),name='search_by_phone_number'),
+
+	path('mark_spam/',MarkSpam.as_view(),name='mark_spam'),	
 ]
