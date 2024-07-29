@@ -9,4 +9,6 @@ urlpatterns=[
 	path('search_by_phone_number/',SearchByPhoneNumber.as_view(),name='search_by_phone_number'),
 
 	path('mark_spam/',MarkSpam.as_view(),name='mark_spam'),	
+	
+	path('contacts/',ContactList.as_view(),name='contact_list'),
 ]

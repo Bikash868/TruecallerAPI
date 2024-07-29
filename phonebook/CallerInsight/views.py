@@ -167,3 +167,32 @@ class MarkSpam(APIView):
             status=status.HTTP_200_OK,
         )
 
+
+#Adding contacts
+class ContactList(APIView):
+    def get(self, request):
+        contacts = Contact.objects.all()
+        serializer = ContactSerializer(contacts,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    def post(self, request):
+        name = request.data.get("name")
+        phone_number = request.data.get("phone_number")
+
+        if not (name and phone_number):
+            return Response(
+                {"Error": "Both name and phone_number are required fields"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        email = request.data.get("email")
+        contact, _ = Contact.objects.get_or_create(
+            name=name, phone_number=phone_number, email=email
+        )
+
+        MatchUserContact.objects.get_or_create(user=request.user, contact=contact)
+
+        return Response(
+            {"Message": "Contact saved successfully"},
+            status=status.HTTP_201_CREATED,
+        )
